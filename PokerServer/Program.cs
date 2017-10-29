@@ -99,6 +99,7 @@ namespace WebSocketServer
                 //server = new Fleck.WebSocketServer("ws://" + Environment.MachineName + ":" + Port + "/");
                 server = new Fleck.WebSocketServer("ws://" + MachineIp + ":" + Port + "/");                
                 server.Start(s => cs.NewClient((WebSocketConnection)s));
+                Console.WriteLine("PID: "+ Process.GetCurrentProcess().Id);
             }
             catch (Exception ex)
             {
