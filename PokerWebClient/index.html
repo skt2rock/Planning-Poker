@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>Planning Poker</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>-->
+    <script type="text/javascript" src="content/js/jquery.min.js"></script>
+    <script type="text/javascript" src="content/js/CardClient.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="content/css/baseline.css" />
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">-->
+    <link rel="stylesheet" href="content/font-awesome-4.7.0/css/font-awesome.css">
+    <link type="text/css" rel="stylesheet" href="content/css/style.css" />
+</head>
+<body>
+
+    <!-- Side menu -->
+    <div class="menu">
+        <div class="body">
+            <h2>Participants</h2>
+            <div id="clientList">
+            </div>
+            <div id="clientOptions">
+                <button id="swapSpectator" class="blue"><i id="specIcon" class="fa fa-lg"></i> <span id="swapSpectatorContent"></span></button>
+            </div>
+            <div class="admin">
+                <h2 id="adminMenuHeader">Admin Menu</h2>
+                <div id="adminMenu">
+                    <button id="showNewRoundPanel"><i class="fa fa-plus fa-lg"></i> New Round</button><br />
+                    <button id="showCardOptions"><i class="fa fa-th-large fa-lg"></i> Card Options</button><br />
+                    <p>
+                        <input type="checkbox" id="autoSort" />
+                        <label for="autoSort">Auto-sort cards when flipped</label><br />
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlays -->
+    <div id="overlay">
+        <div id="lightbox" class="lightbox"></div>
+        <div id="overlayContent" class="lightOverlay">
+
+            <div id="loginForm">
+                <div>                    
+                    <h2>Join a Planning Poker Room</h2>
+                    <p id="disconnected"></p>
+                    <p><label>Select a Room</label><span id="serverListText"></span><select id="serverList"><option disabled="disabled" value="">Loading...</option></select> <button id="refreshServerList"><i class="fa fa-refresh fa fa-lg"></i></button></p>
+                    <p>
+                        <label>Name</label><input id="clientName" type="text" size="15" maxlength="15" />
+                        <span style="margin-left:30px;"><input type="checkbox" id="spectator" /> <label style="margin-left:2px; float:none" for="spectator">Spectator</label></span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="show-admin fa fa-lock" id="showAdmin"></span>
+                    </p>
+                    <p id="nameError">Name contains invalid characters. Not allowed: # : ? +</p>
+
+                    <p><button id="submitLogin">Login</button></p>
+                </div>
+                <div class="admin-panel">
+                    <p><label>Admin Password</label><input type="password" id="adminPass" size="15" maxlength="15" /></p>
+                    <p><button id="submitAdminLogin"><i class="fa fa-lock fa-lg"></i> Login as Admin</button></p>
+                </div>
+            </div>
+            <div id="loginStatus">
+                <span>
+                    Connecting...
+                </span>
+            </div>
+
+        </div>
+    </div>
+    <div id="adminOverlay" class="admin">
+        <div id="adminLightbox" class="lightbox"></div>
+        <div id="adminOverlayContainer" class="lightOverlay">
+
+            <h2>Welcome, Admin!</h2>
+            <p>You have been granted admin priveleges.<br /><br />Enjoy your poker game!</p>
+            <p><button id="adminInfoClose" tabindex="50"><i class="fa fa-remove fa-lg"></i> Close</button></p>
+
+        </div>
+    </div>
+    <div id="newRoundOverlay">
+        <div id="roundLightbox" class="lightbox"></div>
+        <div id="roundOverlay" class="lightOverlay">
+
+            <div id="roundForm">
+                <h2>Begin a New Round</h2>
+                <p>Title: <input id="roundTitle" type="text" size="30" tabindex="10" /></p>
+                <p>
+                    <button id="cancelNewRound" tabindex="30"><i class="fa fa-remove fa-lg"></i> Cancel</button>
+                    <button id="newRound" tabindex="20"><i class="fa fa-check fa-lg"></i> <span style="font-weight: bold;">Begin</span></button>
+                </p>
+            </div>
+
+        </div>
+    </div>
+    <div id="cardChooserOverlay">
+        <div id="cardLightbox" class="lightbox"></div>
+        <div id="cardOverlay" class="lightOverlay">
+
+            <div id="cardForm">
+                <h2>Card Deck Options</h2>
+                <p>Card set: <input id="cardSet" type="text" size="40" tabindex="70" /><br /><span style="font-style: italic;">Enter values separated by commas.</span></p>
+                <p>
+                    <button id="cancelCardset" tabindex="90"><i class="fa fa-remove fa fa-lg"></i> Cancel</button>
+                    <button id="applyCardset" tabindex="80"><i class="fa fa-check fa-lg"></i> <span style="font-weight: bold;">Apply</span></button>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="header"><h1><img class="logo" src="content/css/PokerLogo.png" /><span>FC Planning Poker</span>
+            <span id="room"></span>
+            <span class="fa fa-user-circle"></span></h1></div>
+
+        <h2>Rounds</h2>
+
+        <!-- Any game state updates get populated inside this container. -->
+        <div id="rounds">
+        </div>
+    </div>
+
+</body>
+</html>

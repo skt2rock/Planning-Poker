@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerServer", "PokerServer\PokerServer.csproj", "{87F32190-4822-4F05-8528-572928701581}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerServerManagerWeb", "PokerServerManager\PokerServerManagerWeb.csproj", "{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerWebClient", "PokerWebClient\PokerWebClient.csproj", "{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomManagerForms", "ServerManagerForms\RoomManagerForms.csproj", "{EF968305-C879-4381-97DA-9BA358E9F219}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87F32190-4822-4F05-8528-572928701581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87F32190-4822-4F05-8528-572928701581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87F32190-4822-4F05-8528-572928701581}.Debug|x86.ActiveCfg = Debug|x86
+		{87F32190-4822-4F05-8528-572928701581}.Debug|x86.Build.0 = Debug|x86
+		{87F32190-4822-4F05-8528-572928701581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87F32190-4822-4F05-8528-572928701581}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87F32190-4822-4F05-8528-572928701581}.Release|x86.ActiveCfg = Release|x86
+		{87F32190-4822-4F05-8528-572928701581}.Release|x86.Build.0 = Release|x86
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{916D19E6-2FFD-4DF4-9C9B-928FF09C60EF}.Release|x86.ActiveCfg = Release|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DB7A5E9-E2AD-4C0A-AAFC-8544846F2BE5}.Release|x86.ActiveCfg = Release|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Debug|x86.Build.0 = Debug|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Release|x86.ActiveCfg = Release|Any CPU
+		{EF968305-C879-4381-97DA-9BA358E9F219}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {643B1666-96E6-44E2-8267-70E1E2C736E4}
+	EndGlobalSection
+EndGlobal

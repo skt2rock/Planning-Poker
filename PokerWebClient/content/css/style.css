@@ -1,0 +1,434 @@
+﻿body {
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    color: black;
+}
+
+button {    
+    color: black;
+    padding: 6px 10px 6px 10px;
+    margin: 0 4px;
+    border-radius: 3px;
+}
+
+    button:hover {
+        opacity: .9;
+    }
+
+    button[disabled] {
+        opacity: 0.5;
+    }
+    
+        button[disabled]:active {            
+            background-color: #ccc;
+        }
+
+    button i {
+        margin-right: 5px;
+    }
+
+    button:active {        
+        background-color: #aaa;
+    }
+
+label {
+    margin: 10px;    
+}
+
+input, select {
+    border: 1px solid white;
+    border-radius: 4px;
+    background-color: transparent;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1em;
+    padding: 3px;
+}
+
+    input[disabled] {
+        background-color: #CCC;
+        color: #666;
+    }
+
+    input:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+h1, h2, h3 {
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: black;
+    font-weight: lighter;
+    padding-top: 12px;
+    padding-bottom: 16px;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.7em;
+}
+
+h3 {
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.4em;
+    padding-top: 16px;
+}
+
+p {
+    display: block;
+    margin: 1em 0;
+}
+
+em {
+    font-style: italic;
+}
+
+.lightbox {
+    z-index: 99998;
+    background-color: black;
+    opacity: 0.65;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-align: center;
+}
+
+.fa-lg {
+    float: left;
+    font-size: 1.2em;
+    top: .1em;
+    position: relative;
+}
+
+.lightOverlay {
+    z-index: 99999;
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -250px;
+    background-color: #20A8D8;
+    border: 1px solid #187da0;
+    width: 435px;
+    padding: 15px;
+    color: white;
+}
+
+    .lightOverlay label {
+        float: left;
+    }
+
+    #spectator label {
+        float: none;
+    }
+
+    .lightOverlay .fa-refresh {
+        vertical-align: -20%;
+        left: 7%;
+        position: relative;
+        top: 0px;
+    }
+
+    .lightOverlay h1, .lightOverlay h2, .lightOverlay h3 {
+        color: white;
+    }
+    .lightOverlay button {
+        background-color: #ffc107;        
+    }
+
+.cardup, .carddown {
+    display: inline-block;
+    width: 72px;    
+    border-radius: 1px;
+    margin: 20px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 30px;
+    font-weight: normal;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.carddown {
+    background-color: #555;
+    border: 1px solid #ccc;
+}
+
+.cardoutline {
+    opacity: 0.5;
+}
+
+.cardUndecided {
+    font-style: italic;
+}
+
+.cardup {
+    background-color: #FFCD38;
+    border: 1px solid #e6bb3b;    
+    box-shadow: 0px 0px 0px 10px #FFCD38;
+}
+
+.round {
+    background-color: white;
+    border: 1px solid #c2cfd6;
+    margin-top: -16px;
+}
+
+.round .cardup:hover {
+    background-color: #ffd764;
+    border: 1px solid #c69500;
+    cursor: pointer;
+}
+
+.cardName {
+    font-size: 0.9em;
+    text-align: center;
+    width: 100%;
+}
+
+.decision {
+    width: 98%;
+    background-color: #ddd;
+    padding: 8px;
+    font-size: .9em;
+}
+
+.votes {
+    border: 1px solid #c2cfd6;
+    border-top: 0px;
+    margin-bottom: 15px;
+    background-color: white;
+    min-height: 155px;
+}
+
+.voteContainer {
+    display: inline-block;
+    margin: 8px;
+}
+
+    .voteContainer .card {
+        display: block;
+        margin: 5px auto;
+    }
+
+.voteContainer-empty {
+    font-size: 1.3em;
+    font-style: italic;
+}
+
+    .voteContainer-empty p {
+        display: inline-block;
+        margin: 70px;
+    }
+
+#disconnected {
+    color: #D00;
+}
+
+#loginStatus {
+    margin-top: 180px;
+    font-size: 1.3em;
+}
+
+.menu {
+    width: 255px;
+    clear: none;
+    background-color: #151b1f;
+    color: white;
+    margin: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    font-size: 0.875rem;
+}
+
+    .menu .fa {
+        display: inherit;
+    }
+
+    .menu .fa-user-o:before {
+        margin-right: 15px;
+        color: #20A8D8;
+    }
+
+    .menu .spectator:before, .menu .spectator {
+        color: gray;
+    }
+
+    .menu .admin:before {
+        color: #F86C6B;
+    }
+
+    .menu .fa-id-badge:before {
+        margin-right: 15px;
+    }
+    
+    .menu p {
+        margin: 15px;
+    }
+
+    .menu button {
+        width: 100%;
+        margin: 10px 0px 10px 0px;
+        padding:13px;
+        border-radius: 0px;
+    }
+
+    .menu #clientOptions button {
+        background-color: #20a8d8;
+        border-color: #20a8d8;
+        color: #fff;
+    }
+
+#adminMenu #showNewRoundPanel  {
+    background-color: #4dbd74;
+    border-color: #4dbd74;
+    color: #fff;
+}
+
+#adminMenu #showCardOptions  {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: black;
+}
+
+.admin input, .admin select {
+    border: 1px solid #C2CFD6;
+    border-radius: 4px;
+    background-color: white;
+    color: black;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: .9em;
+    padding: 3px 9px 3px 9px;
+}
+
+    .menu h2 {
+        padding: 0.75rem 1rem;
+        font-size: 13px;
+        font-weight: 600;
+        color: #c2cfd6;
+        text-transform: uppercase;
+    }
+
+    .menu .body{
+        margin-top:63px;
+    }
+
+#loginStatus span {
+    top: -90px;
+    position: relative;
+}
+
+.content {
+    padding: 0 270px 15px 15px;
+    background-color: #E4E5E6;
+}
+
+    .content .header {
+        background-color: white;
+        position: fixed;
+        width: 100%;
+        left: 0px;
+        padding: 0px 15px 0px 15px;
+        border-bottom: 1px solid #c2cfd6;
+    }
+
+.header .logo {
+    width: 55px;    
+    top: -2px;
+    position: absolute;
+}
+
+.header .fa-user-circle {
+    float: right;
+    margin-right: 30px;
+}
+
+    .header .fa-user-circle:before {        
+        margin-right: 10px;
+        font-size: 1.35em;
+    }
+
+.header span {
+    margin-left: 60px;
+}
+    .content h1 {
+        font-size: 1.2em;        
+    }
+    .content h3 {
+        border: 1px solid #C2CFD6;
+        background-color: #F0F3F5;
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: .9em;
+        font-weight: bold;
+        padding: 15px;
+        margin: 25px 0px 0px 0px;
+    }
+
+#clientList {
+    margin-left: 25px;
+}
+
+    #clientList1 p {
+        margin-top: 0;
+        margin-bottom: 0;
+        line-height: 22px;
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-weight: lighter;
+        font-size: 0.875rem;
+    }
+
+        #clientList1 p:before {
+            content: ' • ';
+        }
+
+.separator {
+    text-align: center;
+    margin: 20px 0;
+}
+
+    .separator hr {
+        height: 1px;
+        border: 0;
+        color: #ccc;
+        background-color: #ccc;
+        width: 90%
+    }
+
+#rounds {
+    margin: 0 20px;
+}
+
+    #rounds button {
+        background-color: #F86C6B;
+        color: white;
+    }
+
+    #rounds div.options {
+        padding: 6px;
+        background-color: #F0F3F5;
+    }
+
+    #rounds .decision {
+        background-color: #fff;
+        border: 1px solid #C2CFD6;
+        border-top: 0px;
+        width: auto;
+        padding: 16px;
+    }
+
+
+    #adminMenu input,
+    #adminMenu button {
+        margin: 0px 0;
+    }
+
+.bottomSpacer {
+    min-height: 300px;
+}
