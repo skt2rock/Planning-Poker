@@ -56,15 +56,19 @@ namespace WebSocketServer
         {
             if (args.Length != 3)
             {
-#if !DEBUG
-                ExitWithError("Invalid number of command-line arguments (Password can not contain spaces).");
-#endif
-#if DEBUG
+
                 args = new string[3];
                 args[0] = "FC";
                 args[1] = "8000";
                 args[2] = "abcd";
-#endif
+
+                Console.WriteLine("Enter Room Name:");
+                args[0] = Console.ReadLine();
+                Console.WriteLine("Enter Port No Bet 8000 & 9000:");
+                args[1] = Console.ReadLine();
+                Console.WriteLine("Enter Room Password:");
+                args[2] = Console.ReadLine();
+
             }
 
             int portNumber;
