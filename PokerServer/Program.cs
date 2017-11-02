@@ -5,6 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Fleck;
 using System.Configuration;
+using System.Net;
+using System.Linq;
+using System.Net.Sockets;
 
 namespace WebSocketServer
 {
@@ -14,12 +17,7 @@ namespace WebSocketServer
     class Program
     {
         public static string MachineIp;
-
-        static Program()
-        {
-            MachineIp = ConfigurationManager.AppSettings["MachineIp"];
-        }
-
+        
         /// <summary>
         /// The card server to use for this server instance.
         /// </summary>
@@ -54,13 +52,14 @@ namespace WebSocketServer
         /// </param>
         static void Main(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
 
-                args = new string[3];
+                args = new string[4];
                 args[0] = "FC";
                 args[1] = "8000";
                 args[2] = "abcd";
+                args[3] = "127.0.0.1";
 
                 Console.WriteLine("Enter Room Name:");
                 args[0] = Console.ReadLine();
@@ -68,7 +67,8 @@ namespace WebSocketServer
                 args[1] = Console.ReadLine();
                 Console.WriteLine("Enter Room Password:");
                 args[2] = Console.ReadLine();
-
+                Console.WriteLine("Enter Hosting IP or D for auto detect:");
+                args[3] = Console.ReadLine();
             }
 
             int portNumber;
@@ -87,6 +87,23 @@ namespace WebSocketServer
 
             Name = args[0];
             Port = portNumber;
+            if (args[3].Equals("D"))
+            {
+                if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+                {
+                    throw new Exception("Network not available.");
+                }
+
+                IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+
+                MachineIp = host
+                    .AddressList
+                    .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
+            }
+            else
+            {
+                MachineIp = args[3];
+            }
 
             // Set up the named pipe server and the initial async connection listener.
             NamedPipeServerStream nps = new NamedPipeServerStream("wss" + Process.GetCurrentProcess().Id, PipeDirection.Out, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);

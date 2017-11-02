@@ -9,24 +9,17 @@ namespace PokerRoomManager
 {
     public class RoomManager
     {
-        public static string RoomLocation;
-        public static string RoomName;
+        public static string PokerServerFolderLocation;
+        public static string PokerServerFileName;
         public static string MachineIp;
-
-        static RoomManager()
-        {
-            RoomLocation = ConfigurationManager.AppSettings["SocketServerLocation"];
-            RoomName = ConfigurationManager.AppSettings["SocketServerName"];
-            MachineIp = ConfigurationManager.AppSettings["MachineIp"];
-        }
-
+        
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public static List<Room> GetActiveRoomList()
         {
             List<Room> roomList = new List<Room>();
             List<int> pids = new List<int>();
 
-            foreach (Process p in Process.GetProcessesByName(RoomName))
+            foreach (Process p in Process.GetProcessesByName(PokerServerFileName))
             {
                 pids.Add(p.Id);
             }
@@ -56,15 +49,15 @@ namespace PokerRoomManager
             return roomList;
         }
 
-        public static void StartRoom(string name, int port, string pass)
+        public static void StartRoom(string name, int port, string pwd, string ip)
         {
             Process p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = Path.Combine(RoomLocation, RoomName + ".exe"),
+                    FileName = Path.Combine(PokerServerFolderLocation, PokerServerFileName + ".exe"),
                     WindowStyle = ProcessWindowStyle.Minimized,
-                    Arguments = name + " " + port + " " + pass,
+                    Arguments = name + " " + port + " " + pwd + " " + ip,
                     UseShellExecute = true,                    
                 }
             };

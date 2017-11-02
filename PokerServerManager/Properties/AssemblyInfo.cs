@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PokerServerManager")]
-[assembly: AssemblyCopyright("GNU GPL v3 - http://github.com/qjake/planning-poker")]
+[assembly: AssemblyCopyright("skt2rock")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

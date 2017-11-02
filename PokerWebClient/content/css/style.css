@@ -45,10 +45,14 @@ input, select {
     padding: 3px;
 }
 
-    input[disabled] {
-        background-color: #CCC;
-        color: #666;
-    }
+.lightOverlay optgroup, .lightOverlay option {
+    color: black;
+}
+
+input[disabled] {
+    background-color: #CCC;
+    color: #666;
+}
 
     input:focus {
         background-color: rgba(255, 255, 255, 0.1);

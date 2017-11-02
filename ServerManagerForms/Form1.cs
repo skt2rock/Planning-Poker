@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -57,7 +58,7 @@ namespace RoomManagerForms
                 return;
             }
 
-            RoomManager.StartRoom(RoomName.Text, int.Parse(PortNumber.Text), Password.Text);
+            RoomManager.StartRoom(RoomName.Text, int.Parse(PortNumber.Text), Password.Text, IP.Text);
 
             Thread.Sleep(500); // Give it a second to start up before we refresh the room list.
 
@@ -88,10 +89,10 @@ namespace RoomManagerForms
         // A simple thread based web server to host the web client.
 
         static HttpListener _httpListener = new HttpListener();
-        static string WebSiteLocation = ConfigurationManager.AppSettings["WebSiteLocation"];
-        static string HostingUrl = ConfigurationManager.AppSettings["HostingUrl"];
-        static string DefaultFile = ConfigurationManager.AppSettings["DefaultFile"];
-        static string RoomListTrigger = ConfigurationManager.AppSettings["RoomListTrigger"];
+        static string WebSiteLocation;
+        static string HostingUrl;
+        static string DefaultFile;
+        static string RoomListTrigger;
 
         private void ClientUrl_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -101,9 +102,12 @@ namespace RoomManagerForms
         private void btnHostWebClient_Click(object sender, EventArgs e)
         {
             MessageWebHost.Text = "Starting Web Client Host...";
+            RoomListTrigger = WebHostRoomListTrigger.Text;
+            DefaultFile = WebHostDefaultFile.Text;
             try
             {
-                HostingUrl = UrlToHostAt.Text; // comment this line to read url from app config
+                RoomManager.MachineIp = IP.Text;
+                HostingUrl = UrlToHostAt.Text;
                 _httpListener.Prefixes.Add(HostingUrl);
                 _httpListener.Start(); // start web server (Run application as Administrator!)
                 MessageWebHost.Text = "Client Hosted @:";
@@ -114,7 +118,7 @@ namespace RoomManagerForms
             }
             catch (Exception ex)
             {                
-                MessageWebHost.Text = "Failed to start host, try again.";
+                MessageWebHost.Text = "Failed to start host, Check for permissions";
             }
         }
 
@@ -183,7 +187,15 @@ namespace RoomManagerForms
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            RoomListTrigger = WebHostRoomListTrigger.Text;
+            DefaultFile = WebHostDefaultFile.Text;
+            WebSiteLocation = WebClientFolderPath.Text = Directory.GetCurrentDirectory() + @"\PokerWebClient";
+            PokerServerFilePath.Text = Directory.GetCurrentDirectory() + @"\PokerServer.exe";
+            PopulateRoomManager();
+            AutoDetectMachineIP();
+            HostingUrl = UrlToHostAt.Text = "http://" + RoomManager.MachineIp + ":5000/";
             this.ActiveControl = UrlToHostAt;
+            BindRoomList();
         }
 
         private void RefreshRoomList_Click(object sender, EventArgs e)
@@ -199,6 +211,75 @@ namespace RoomManagerForms
             }
             catch (Exception ex) { }
             BindRoomList();
+        }
+
+        private void btnAutoDetectIP_Click(object sender, EventArgs e)
+        {
+            AutoDetectMachineIP();
+        }
+
+        private void AutoDetectMachineIP()
+        {
+            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                MessageFail.Text = "Network not available";
+            }
+
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+             
+            string ipAddress = host
+                .AddressList
+                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
+            this.IP.Text = RoomManager.MachineIp = ipAddress;
+        }
+
+        private void btnBrowsePokerServerFile_Click(object sender, EventArgs e)
+        {
+            FileDialogPokerServer.ShowDialog();
+        }
+
+        private void FileDialogPokerServer_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            PokerServerFilePath.Text = FileDialogPokerServer.FileName;
+            PopulateRoomManager();
+        }
+
+        private void PopulateRoomManager()
+        {
+            try
+            {
+                RoomManager.PokerServerFolderLocation = PokerServerFilePath.Text.Remove(PokerServerFilePath.Text.LastIndexOf(@"\"));
+                RoomManager.PokerServerFileName = PokerServerFilePath.Text.Remove(0, PokerServerFilePath.Text.LastIndexOf(@"\") + 1).Replace(".exe", string.Empty);
+                FailMessagePokerServerFileStatus.Visible = false;
+            }
+            catch (Exception ex) {
+                FailMessagePokerServerFileStatus.Visible = true;
+                FailMessagePokerServerFileStatus.Text = "Poker Server File Path not valid";
+            }
+        }
+
+        private void btnWebClientPath_Click(object sender, EventArgs e)
+        {
+            DialogResult result = FolderBrowserWebClient.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                this.WebClientFolderPath.Text = this.FolderBrowserWebClient.SelectedPath;
+            }
+        }
+
+        private void WebClientFolderPath_TextChanged(object sender, EventArgs e)
+        {
+            WebSiteLocation = WebClientFolderPath.Text;
+        }
+
+        private void UrlToHostAt_TextChanged(object sender, EventArgs e)
+        {
+            HostingUrl = UrlToHostAt.Text;
+        }
+
+        private void PokerServerFilePath_TextChanged(object sender, EventArgs e)
+        {
+            PopulateRoomManager();
         }
     }
 }
