@@ -44,6 +44,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.FailMessagePokerServerFileStatus = new System.Windows.Forms.Label();
             this.btnBrowsePokerServerFile = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.PokerServerFilePath = new System.Windows.Forms.MaskedTextBox();
@@ -67,7 +68,7 @@
             this.FileDialogPokerServer = new System.Windows.Forms.OpenFileDialog();
             this.FolderBrowserWebClient = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.FailMessagePokerServerFileStatus = new System.Windows.Forms.Label();
+            this.lblTest = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RoomContainer)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -233,6 +234,16 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Poker Room Server";
             // 
+            // FailMessagePokerServerFileStatus
+            // 
+            this.FailMessagePokerServerFileStatus.AutoSize = true;
+            this.FailMessagePokerServerFileStatus.ForeColor = System.Drawing.Color.Red;
+            this.FailMessagePokerServerFileStatus.Location = new System.Drawing.Point(6, 84);
+            this.FailMessagePokerServerFileStatus.Name = "FailMessagePokerServerFileStatus";
+            this.FailMessagePokerServerFileStatus.Size = new System.Drawing.Size(23, 13);
+            this.FailMessagePokerServerFileStatus.TabIndex = 27;
+            this.FailMessagePokerServerFileStatus.Text = "Fail";
+            // 
             // btnBrowsePokerServerFile
             // 
             this.btnBrowsePokerServerFile.Location = new System.Drawing.Point(328, 49);
@@ -373,7 +384,7 @@
             // ClientUrl
             // 
             this.ClientUrl.AutoSize = true;
-            this.ClientUrl.Location = new System.Drawing.Point(223, 191);
+            this.ClientUrl.Location = new System.Drawing.Point(231, 191);
             this.ClientUrl.Name = "ClientUrl";
             this.ClientUrl.Size = new System.Drawing.Size(49, 13);
             this.ClientUrl.TabIndex = 3;
@@ -457,21 +468,21 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Create Room";
             // 
-            // FailMessagePokerServerFileStatus
+            // lblTest
             // 
-            this.FailMessagePokerServerFileStatus.AutoSize = true;
-            this.FailMessagePokerServerFileStatus.ForeColor = System.Drawing.Color.Red;
-            this.FailMessagePokerServerFileStatus.Location = new System.Drawing.Point(6, 84);
-            this.FailMessagePokerServerFileStatus.Name = "FailMessagePokerServerFileStatus";
-            this.FailMessagePokerServerFileStatus.Size = new System.Drawing.Size(23, 13);
-            this.FailMessagePokerServerFileStatus.TabIndex = 27;
-            this.FailMessagePokerServerFileStatus.Text = "Fail";
+            this.lblTest.AutoSize = true;
+            this.lblTest.Location = new System.Drawing.Point(38, 534);
+            this.lblTest.Name = "lblTest";
+            this.lblTest.Size = new System.Drawing.Size(31, 13);
+            this.lblTest.TabIndex = 25;
+            this.lblTest.Text = "Test:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 562);
+            this.Controls.Add(this.lblTest);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -488,6 +499,7 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -533,6 +545,7 @@
         private System.Windows.Forms.MaskedTextBox WebHostDefaultFile;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label FailMessagePokerServerFileStatus;
+        private System.Windows.Forms.Label lblTest;
     }
 }
 

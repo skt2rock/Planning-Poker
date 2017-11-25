@@ -17,7 +17,7 @@ namespace RoomManagerForms
     public partial class Form1 : Form
     {
         public static List<Room> ActiveRoomList { get; set; }
-        
+
         public Form1()
         {
             InitializeComponent();
@@ -89,6 +89,7 @@ namespace RoomManagerForms
         // A simple thread based web server to host the web client.
 
         static HttpListener _httpListener = new HttpListener();
+        Thread _responseThread;
         static string WebSiteLocation;
         static string HostingUrl;
         static string DefaultFile;
@@ -101,6 +102,31 @@ namespace RoomManagerForms
 
         private void btnHostWebClient_Click(object sender, EventArgs e)
         {
+            // Checks if Web Clinet Folder path points to the correct folder.
+            if (!File.Exists(WebSiteLocation + @"\" + DefaultFile))
+            {
+                MessageBox.Show("The Web Client folder does not have the default file. Please point to the right Web Client Folder.", "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+            }
+            else
+            {
+                // Confirms Re-Hosting if already hosted before.
+                if (_httpListener.IsListening)
+                {
+                    DialogResult dr = MessageBox.Show(text: "Are you sure, you want to restart hosting the web client?", caption: "Warning", buttons: MessageBoxButtons.YesNo, icon: MessageBoxIcon.Warning);
+                    if (dr.ToString().Equals("Yes"))
+                    {
+                        HostWebClient(true);
+                    }
+                }
+                else
+                {
+                    HostWebClient(false);
+                }
+            }
+        }
+
+        private void HostWebClient(bool isRestart)
+        {
             MessageWebHost.Text = "Starting Web Client Host...";
             RoomListTrigger = WebHostRoomListTrigger.Text;
             DefaultFile = WebHostDefaultFile.Text;
@@ -108,17 +134,24 @@ namespace RoomManagerForms
             {
                 RoomManager.MachineIp = IP.Text;
                 HostingUrl = UrlToHostAt.Text;
+                if (isRestart)
+                {
+                    _httpListener.Stop();
+                    _responseThread.Abort();
+                    _responseThread.Join();
+
+                }
                 _httpListener.Prefixes.Add(HostingUrl);
                 _httpListener.Start(); // start web server (Run application as Administrator!)
-                MessageWebHost.Text = "Client Hosted @:";
+                MessageWebHost.Text = isRestart ? "Client Re-Hosted @:" : "Client Hosted @:";
                 ClientUrl.Text = HostingUrl;
-                Thread _responseThread = new Thread(ResponseThread);
+                _responseThread = new Thread(ResponseThread);
                 _responseThread.IsBackground = true;
                 _responseThread.Start(); // start the response thread
             }
             catch (Exception ex)
-            {                
-                MessageWebHost.Text = "Failed to start host, Check for permissions";
+            {
+                MessageWebHost.Text = "Failed to start host, Need admin priviledge to run.";
             }
         }
 
@@ -126,42 +159,61 @@ namespace RoomManagerForms
         {
             while (true)
             {
-                HttpListenerContext context = _httpListener.GetContext(); // get a context
-                // Now, you'll find the request URL in context.Request.Url
-                string requestedPathUrl = context.Request.Url.PathAndQuery;
-
-                // Removes all querry string parameters. Since the webhost simply reads the file, it cannot handle query strings.           
-                if (requestedPathUrl.Contains("?"))
+                try
                 {
-                    requestedPathUrl = requestedPathUrl.Remove(requestedPathUrl.IndexOf("?"));
+                    HttpListenerContext context = _httpListener.GetContext(); // get a context
+
+                    // Now, you'll find the request URL in context.Request.Url
+                    string requestedPathUrl = context.Request.Url.PathAndQuery;
+
+                    // Removes all querry string parameters. Since the webhost simply reads the file, it cannot handle query strings.           
+                    if (requestedPathUrl.Contains("?"))
+                    {
+                        requestedPathUrl = requestedPathUrl.Remove(requestedPathUrl.IndexOf("?"));
+                    }
+
+                    //Converts web path to file path
+                    string filePath = WebSiteLocation + requestedPathUrl.Replace("/", @"\");
+                    
+                    if (requestedPathUrl == "/")
+                    {
+                        filePath += DefaultFile;
+                    }
+                    else if (requestedPathUrl.StartsWith(RoomListTrigger))
+                    {
+                        var obj = new JObject(new JProperty("machineName", RoomManager.MachineIp), new JProperty("servers", JArray.FromObject(RoomManager.GetActiveRoomList())));
+                        byte[] _responseArray = Encoding.UTF8.GetBytes(obj.ToString());
+                        RespondToRequestWith(context, _responseArray);
+                        continue; // skips the loop to avoid opening the trigger file.
+                    }
+
+                    if (File.Exists(filePath))
+                    {
+                        byte[] _responseArray = File.ReadAllBytes(filePath);
+                        RespondToRequestWith(context, _responseArray);
+                    }
+                    else
+                    {
+                        byte[] _responseArray = Encoding.UTF8.GetBytes("File not found, please check the URL, or ask admin to point to the right Web Client Folder");
+                        RespondToRequestWith(context, _responseArray);
+                    }
                 }
-
-                //Converts web path to file path
-                string filePath = WebSiteLocation + requestedPathUrl.Replace("/", @"\");
-
-                if (requestedPathUrl == "/")
+                catch (HttpListenerException ex)
                 {
-                    filePath += DefaultFile;
-                }
-                else if (requestedPathUrl.StartsWith(RoomListTrigger))
-                {
-                    var obj = new JObject(new JProperty("machineName", RoomManager.MachineIp), new JProperty("servers", JArray.FromObject(RoomManager.GetActiveRoomList())));
-                    byte[] _responseArray = Encoding.UTF8.GetBytes(obj.ToString());
-                    context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-                    context.Response.KeepAlive = false; // set the KeepAlive bool to false
-                    context.Response.Close(); // close the connection
-                    continue; // skips the loop to avoid opening the trigger file.
-                }
-
-                if (File.Exists(filePath))
-                {
-                    byte[] _responseArray = File.ReadAllBytes(filePath);
-                    context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
-                    context.Response.KeepAlive = false; // set the KeepAlive bool to false
-                    context.Response.Close(); // close the connection                                      
+                    // Thrown when previous thread is still running and listening to the same socket.
+                    continue;
                 }
             }
         }
+
+        private static void RespondToRequestWith(HttpListenerContext context, byte[] _responseArray)
+        {
+            context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
+            context.Response.KeepAlive = false; // set the KeepAlive bool to false
+            context.Response.Close(); // close the connection                                      
+        }
+
+
 
         #endregion
 
@@ -226,7 +278,7 @@ namespace RoomManagerForms
             }
 
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-             
+
             string ipAddress = host
                 .AddressList
                 .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
@@ -252,7 +304,8 @@ namespace RoomManagerForms
                 RoomManager.PokerServerFileName = PokerServerFilePath.Text.Remove(0, PokerServerFilePath.Text.LastIndexOf(@"\") + 1).Replace(".exe", string.Empty);
                 FailMessagePokerServerFileStatus.Visible = false;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 FailMessagePokerServerFileStatus.Visible = true;
                 FailMessagePokerServerFileStatus.Text = "Poker Server File Path not valid";
             }

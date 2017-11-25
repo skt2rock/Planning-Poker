@@ -49,6 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="chat.html" />
     <Content Include="content\css\baseline.css" />
     <Content Include="content\css\font-awesome.min.css" />
     <Content Include="content\css\PokerLogo.png" />
@@ -58,6 +59,7 @@
     <Content Include="content\font-awesome-4.7.0\fonts\fontawesome-webfont.svg" />
     <Content Include="content\font-awesome-4.7.0\HELP-US-OUT.txt" />
     <Content Include="content\js\CardClient.js" />
+    <Content Include="content\js\chat.js" />
     <Content Include="content\js\jquery.min.js" />
     <Content Include="index.html" />
   </ItemGroup>

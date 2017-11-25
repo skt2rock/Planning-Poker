@@ -1,7 +1,7 @@
 // Configure this to be equal to RoomListTrigger in App.config of server manager forms application:
 var RoomListTrigger = '/getroomlist/';
 var TryHardCodedServer = false;
-var HardCodedServerDetails = '{ "machineName": "169.254.123.121", "servers": [ { "Name": "fc", "Port": 8000, "Pid": 5948 } ] }';
+var HardCodedServerDetails = '{ "machineName": "169.254.123.121", "servers": [ { "Name": "FC", "Port": 8000, "Pid": 8640 } ] }';
 
 var socket = null;
 var clientName = null;
@@ -261,12 +261,12 @@ function beginLoadServerList() {
                 serverList = d;
 
                 if (serverList.servers.length == 0) {
-                    $('#serverListText').html('<em>No servers running.</em>');
+                    $('#serverListText').html('<em>No Rooms available.</em>');
                 }
                 else {
                     $('#serverListText').hide();
                     $('#serverList').show().empty();
-                    var group = $('<optgroup label="Select a server:" />');
+                    var group = $('<optgroup label="Select a Room:" />');
 
                     for (var i = 0; i < serverList.servers.length; i++) {
                         group.append($('<option />').text(serverList.servers[i].Name).val(i));
@@ -332,7 +332,7 @@ function setupSocket() {
             $('#disconnected').html('The room has terminated the connection.');
         }
         else {
-            $('#disconnected').html('Unable to connect to the server.');
+            $('#disconnected').html('Unable to enter the room.');
         }
         $('#disconnected').show();
         everConnected = false;

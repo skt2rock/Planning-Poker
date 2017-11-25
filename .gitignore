@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/PokerServer/bin/Debug
+/PokerServer/obj/Debug
+/PokerServerManager/bin
+/PokerServerManager/obj/Debug
+/PokerWebClient/bin
+/PokerWebClient/obj/Debug
+/ServerManagerForms/bin/Debug
+/ServerManagerForms/obj/Debug
