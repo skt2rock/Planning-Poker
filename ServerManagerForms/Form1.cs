@@ -164,14 +164,8 @@ namespace RoomManagerForms
                     HttpListenerContext context = _httpListener.GetContext(); // get a context
 
                     // Now, you'll find the request URL in context.Request.Url
-                    string requestedPathUrl = context.Request.Url.PathAndQuery;
-
-                    // Removes all querry string parameters. Since the webhost simply reads the file, it cannot handle query strings.           
-                    if (requestedPathUrl.Contains("?"))
-                    {
-                        requestedPathUrl = requestedPathUrl.Remove(requestedPathUrl.IndexOf("?"));
-                    }
-
+                    string requestedPathUrl = context.Request.Url.AbsolutePath;
+                    
                     //Converts web path to file path
                     string filePath = WebSiteLocation + requestedPathUrl.Replace("/", @"\");
                     
@@ -208,9 +202,15 @@ namespace RoomManagerForms
 
         private static void RespondToRequestWith(HttpListenerContext context, byte[] _responseArray)
         {
+            // forces urls with html to be read as html instead of as text by the browser.
+            if (context.Request.Url.AbsolutePath.EndsWith("html"))
+            {
+                context.Response.ContentType = "text/html";
+            }
+            
             context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             context.Response.KeepAlive = false; // set the KeepAlive bool to false
-            context.Response.Close(); // close the connection                                      
+            context.Response.Close(); // close the connection
         }
 
 

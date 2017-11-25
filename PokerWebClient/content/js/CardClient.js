@@ -11,6 +11,7 @@ var isAdmin = false;
 var isSpectator = false;
 var clientListCache = null;
 var serverList = null;
+var chatWindow = null;
 
 var half = /^(0?\.5)|(1\/2)|(½)$/;
 var serverPattern = /^([A-Za-z0-9]+):(\d{1,5})$/;
@@ -76,6 +77,10 @@ function registerStaticEvents() {
     $('#submitLogin').click(function () {
         isTryingAdmin = false;
         clientLogin();
+    });
+
+    $('#startChatWindow').click(function () {
+        clientChatWindow();
     });
 
     $('#submitAdminLogin').click(function () {
@@ -249,7 +254,7 @@ END Custom hardcode servers
 function beginLoadServerList() {
     $('#serverList').hide();
     $('#serverListText').show().html('Loading...');
-    
+
     if (TryHardCodedServer) {
         connectHardCodedServers();
     }
@@ -279,6 +284,25 @@ function beginLoadServerList() {
             }
         });
     }
+}
+
+function clientChatWindow() {
+    var serverListIndex = $('#serverList').val();
+    if (serverListIndex == -1) {
+        alert("Please select a server to connect to.");
+        return;
+    }
+    if ($('#clientName').val().length < 2) {
+        alert("Name is too short.");
+        return;
+    }
+    clientName = $('#clientName').val();
+
+    chatWindow = window.open("chat.html", "Chat Box", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=yes, copyhistory=no, width=w, height=h, top=top, left=left');
+    
+    window.setTimeout(function () {
+        chatWindow.initializeChatWindow(clientName, serverList.servers[serverListIndex].Name, serverList.machineName, serverList.servers[serverListIndex].Port);
+    }, 1000);   
 }
 
 function clientLogin() {

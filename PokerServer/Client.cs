@@ -236,7 +236,7 @@ namespace WebSocketServer
                 SendError("RegisterVote", "Cannot vote at this time. You may have already voted, or a round may not be in progress.");
             }
         }
-    
+
         /// <summary>
         /// Un-does a registered vote for this user for the active round.
         /// </summary>
@@ -251,6 +251,19 @@ namespace WebSocketServer
             {
                 SendError("UndoVote", "Unable to undo vote at this time.");
             }
+        }
+
+        #endregion
+
+        #region Chat Functions
+
+        /// <summary>
+        /// Broadcasts chat message to all clients in the room.
+        /// </summary>
+        [WebSocketCall]
+        public void PostChatToRoom(string from, string message)
+        {
+            server.BroadcastMessage(null, "PostChatToRoom", new JProperty []{ new JProperty("From", from), new JProperty("Message", message), new JProperty("When", DateTime.UtcNow) });
         }
 
         #endregion

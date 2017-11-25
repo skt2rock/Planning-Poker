@@ -15,17 +15,13 @@ namespace WebSocketServer
         /// The current list of connected clients.
         /// </summary>
         public List<Client> Clients { get; private set; }
-
-        /// <summary>
-        /// The list of current and past rounds that have bene played.
-        /// </summary>
-        public List<Round> Rounds { get; private set; }
+               
 
         /// <summary>
         /// The current list of logged-in game admins.
         /// </summary>
         public List<Client> Admins { get; private set; }
-
+        
         /// <summary>
         /// The admin password.
         /// </summary>
@@ -35,6 +31,11 @@ namespace WebSocketServer
         /// The settings store.
         /// </summary>
         public Dictionary<string, string> Settings { get; private set; }
+
+        /// <summary>
+        /// The list of current and past rounds that have bene played.
+        /// </summary>
+        public List<Round> Rounds { get; private set; }
 
         /// <summary>
         /// Helper property to retrieve the current active round from the list of rounds. A round is "active" if it does not have a decision.

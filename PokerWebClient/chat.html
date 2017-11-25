@@ -3,19 +3,24 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>-->
+    <script type="text/javascript" src="content/js/jquery.min.js"></script>
+    <script src="content/js/chat.js"></script>
 </head>
 <body>
-    <div id="chatWith">User Name</div>
+    <div id="currentUser">User Name</div>
+    <div>
+        <label>Users</label>
+        <ul id="clientList"></ul>
+    </div>
     <div>
         Chat conversation
-        <ul id="chatList">
-            <li>Hi there</li>
-            <li>I am good</li>
+        <ul id="chatList">            
         </ul>
     </div>
     <div>
         <textarea id="textToSend"></textarea>
-        <button id="send"></button>
+        <button id="send">Send</button>
     </div>
 </body>
 </html>
