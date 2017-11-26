@@ -24,16 +24,27 @@ var dbRoomChat;
 
 $(function () {
     registerStaticEvents();
+    autoResizeContent();
+    $(window).resize(function () {
+        autoResizeContent();
+    });
+    initializeChatWindow();
 });
 
-function initializeChatWindow(clntName, romName, mchnName, port) {
-    clientName = clntName;
-    roomName = romName;
-    serverMachineName = mchnName;
-    serverPort = port;
-    currentChatPaneId = romName;
-    currentChatPaneName = romName;
-    
+function autoResizeContent() {
+    $height = $(window).height() - 218;
+    $('#chatList').height($height);
+}
+
+function initializeChatWindow() {
+
+    clientName = localStorage.getItem("clientName");
+    roomName = localStorage.getItem("serverName");
+    serverMachineName = localStorage.getItem("machineName");
+    serverPort = localStorage.getItem("port");
+    currentChatPaneId = localStorage.getItem("serverName");
+    currentChatPaneName = localStorage.getItem("serverName");
+
     $('#currentUser').html(clientName);
     $("#withUserOrRoom").text(currentChatPaneName);
 
@@ -41,7 +52,9 @@ function initializeChatWindow(clntName, romName, mchnName, port) {
     setupSocket();
 
     initializeDb();
-    reloadChatRoomDataFromDb();    
+    reloadChatRoomDataFromDb();
+
+    $('#clientList li:first').addClass("active");
 }
 
 function initializeDb() {
@@ -66,8 +79,7 @@ function initializeDb() {
     }
 }
 
-function registerStaticEvents()
-{
+function registerStaticEvents() {
     $('#send').click(function () {
         var chatMessage = $('#textToSend').val();
         var command = currentChatPaneName == roomName ? "PostChatToRoom" : "PostChatToPerson";
@@ -106,17 +118,25 @@ function setupSocket() {
 function processIncoming(msgData) {
     if (typeof (msgData.Error) !== 'undefined' && !msgData.Error) {
         switch (msgData.Command) {
-            //case 'ReceiveChatForRoom':
-            //    updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
-            //    if (currentChatPaneName == roomName) {
-            //        updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
-            //    }
-            //    break;
-            //case 'ReceiveChatFromUser':
             case 'ReceiveChat':
                 updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
-                if (currentChatPaneName == msgData.FromName || currentChatPaneName == msgData.ToName) {
-                    updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
+                // show new message notification for all users, if not in there pane
+                if (msgData.ToName.toUpperCase() != roomName.toUpperCase() &&
+                    msgData.FromName.toUpperCase() != currentChatPaneName.toUpperCase()) {
+                    $('[name="' + msgData.FromName + '"]').addClass("new-message");
+                }
+                // show new message notification in room chat if not in room pane
+                if (currentChatPaneName.toUpperCase() != roomName.toUpperCase() && msgData.ToName.toUpperCase() == roomName.toUpperCase()) {
+                    $('[name="' + roomName + '"]').addClass("new-message");
+                }
+
+                if (currentChatPaneName.toUpperCase() == msgData.FromName.toUpperCase() || currentChatPaneName.toUpperCase() == msgData.ToName.toUpperCase()) {
+                    if (msgData.ToName.toUpperCase() != roomName.toUpperCase()) {
+                        updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
+                    }
+                    else if (currentChatPaneName.toUpperCase() == roomName.toUpperCase()) {
+                        updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
+                    }
                 }
                 break;
             case 'ClientList':
@@ -128,8 +148,19 @@ function processIncoming(msgData) {
 
 // used by other methods, modify with caution.
 function updateChatRoomHtml(when, from, message) {
-    $("#chatList").append(
-        $('<li>').append(from + ':' + message));
+    // if current user has posted, dont show name in bubble
+    if (from.toUpperCase() == clientName.toUpperCase()) {
+        $("#chatList").append(
+            $('<li>').addClass("me").append($("<div>").addClass("message").append(message)));
+    }
+    // show name in bubble for other users post
+    else {
+        $("#chatList").append(
+            $('<li>').append($('<div>').addClass("sender").append(from)).append($("<div>").addClass("message").append(message)));
+    }
+
+    // Scroll to bottom when new message arrives.    
+    $("#chatList").parent(".card-body").scrollTop(999999999999999);
 }
 
 
@@ -152,11 +183,11 @@ function reloadChatFromDataFromDb(fromName) {
         var cursor = event.target.result;
         if (cursor) {
             // Display only chats with the chosen user.
-            if ((cursor.value.fromName == fromName && cursor.value.toName == clientName) || (cursor.value.toName == fromName && cursor.value.fromName == clientName)) {
+            if ((cursor.value.fromName.toUpperCase() == fromName.toUpperCase() && cursor.value.toName.toUpperCase() == clientName.toUpperCase()) || (cursor.value.toName.toUpperCase() == fromName.toUpperCase() && cursor.value.fromName.toUpperCase() == clientName.toUpperCase())) {
                 updateChatRoomHtml(cursor.value.when, cursor.value.fromName, cursor.value.message);
             }
             cursor.continue();
-        }        
+        }
     }
 }
 
@@ -171,7 +202,7 @@ function reloadChatRoomDataFromDb() {
                 updateChatRoomHtml(cursor.value.when, cursor.value.fromName, cursor.value.message);
             }
             cursor.continue();
-        }        
+        }
     }
 }
 
@@ -208,20 +239,24 @@ function updateClientList(data) {
     $('#clientList').empty();
 
     var userElement = $('<li>');
+    userElement.addClass("fa fa-home");
     userElement.append(roomName);
     userElement.attr("id", roomName);
+    userElement.attr("name", roomName);
     $('#clientList').append(userElement);
 
     data.forEach(function (e) {
 
         // Updates the ID of the current logged in user.
-        if (e.Name == clientName) {
+        if (e.Name.toUpperCase() == clientName.toUpperCase()) {
             clientID = e.ID;
         }
         else {
             var userElement = $('<li>');
+            userElement.addClass("fa fa-user-o");
             userElement.append(e.Name);
             userElement.attr("id", e.ID);
+            userElement.attr("name", e.Name);
             $('#clientList').append(userElement);
         }
     });
@@ -230,11 +265,15 @@ function updateClientList(data) {
         $("#chatList").html("");
 
         currentChatPaneId = this.id;
-        currentChatPaneName = this.innerText;
+        currentChatPaneName = this.getAttribute("name");
+
+        $(this).removeClass("new-message");
+        $('#clientList li').removeClass("active");
+        $(this).addClass("active");
 
         $("#withUserOrRoom").text(currentChatPaneName);
 
-        if (this.id == roomName) {
+        if (this.id.toUpperCase() == roomName.toUpperCase()) {
             reloadChatRoomDataFromDb();
         }
 

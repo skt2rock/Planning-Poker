@@ -6,21 +6,41 @@
     <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>-->
     <script type="text/javascript" src="content/js/jquery.min.js"></script>
     <script src="content/js/chat.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="content/css/baseline.css" />
+    <link rel="stylesheet" href="content/font-awesome-4.7.0/css/font-awesome.css">
+    <link type="text/css" rel="stylesheet" href="content/css/style.css" />
 </head>
-<body>
-    <div id="currentUser">User Name</div>
-    <div>
-        <label>Users</label>
-        <ul id="clientList"></ul>
+<body class="chat">
+
+    <div class="menu">
+        <div class="body">
+            <h2>Users</h2>
+            <ul id="clientList"></ul>
+        </div>
     </div>
-    <div>
-        Chat conversation @ <label id="withUserOrRoom"></label>
-        <ul id="chatList">            
-        </ul>
+
+    <div class="content">
+        <div class="header">
+            <h1>
+                <img class="logo" src="content/css/ChatLogo.png"><span>FC Chat</span>                
+                <span class="fa fa-user-circle" id="currentUser">skt</span>
+            </h1>
+        </div>
+
+        <div class="body">
+            <div class="card">
+                <div class="card-header"><strong id="withUserOrRoom"></strong></div>
+                <div class="card-body">                    
+                    <ul id="chatList"></ul>
+                </div>
+                <div class="card-footer">
+                    <input id="textToSend" class="send-text"></input>
+                    <button id="send" class="fa fa-paper-plane send-button"></button>
+                </div>
+            </div>           
+        </div>
     </div>
-    <div>
-        <textarea id="textToSend"></textarea>
-        <button id="send">Send</button>
-    </div>
+    
 </body>
 </html>

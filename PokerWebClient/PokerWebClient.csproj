@@ -51,6 +51,7 @@
   <ItemGroup>
     <Content Include="chat.html" />
     <Content Include="content\css\baseline.css" />
+    <Content Include="content\css\ChatLogo.png" />
     <Content Include="content\css\font-awesome.min.css" />
     <Content Include="content\css\PokerLogo.png" />
     <Content Include="content\css\style.css" />

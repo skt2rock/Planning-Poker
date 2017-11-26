@@ -297,12 +297,17 @@ function clientChatWindow() {
         return;
     }
     clientName = $('#clientName').val();
-
+    
+    localStorage.setItem("clientName", clientName);
+    localStorage.setItem("serverName", serverList.servers[serverListIndex].Name);
+    localStorage.setItem("machineName", serverList.machineName);
+    localStorage.setItem("port", serverList.servers[serverListIndex].Port);
+   
     chatWindow = window.open("chat.html", "Chat Box", 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=yes, copyhistory=no, width=w, height=h, top=top, left=left');
     
-    window.setTimeout(function () {
-        chatWindow.initializeChatWindow(clientName, serverList.servers[serverListIndex].Name, serverList.machineName, serverList.servers[serverListIndex].Port);
-    }, 1000);   
+    //window.setTimeout(function () {
+    //    chatWindow.initializeChatWindow(clientName, serverList.servers[serverListIndex].Name, serverList.machineName, serverList.servers[serverListIndex].Port);
+    //}, 1000);   
 }
 
 function clientLogin() {
