@@ -17,29 +17,31 @@ var queryStringParams = null;
 
 const c_room = "room";
 const c_databaseName = "ppRoomChat";
-var currentChatPane = c_room;
+var currentChatPaneId;
+var currentChatPaneName;
 
 var dbRoomChat;
 
-function initializeChatWindow(cName, rName, mName, port) {
-    clientName = cName;
-    roomName = rName;
-    serverMachineName = mName;
-    serverPort = port;
+$(function () {
+    registerStaticEvents();
+});
 
-    initializeDb();
+function initializeChatWindow(clntName, romName, mchnName, port) {
+    clientName = clntName;
+    roomName = romName;
+    serverMachineName = mchnName;
+    serverPort = port;
+    currentChatPaneId = romName;
+    currentChatPaneName = romName;
     
     $('#currentUser').html(clientName);
-    
+    $("#withUserOrRoom").text(currentChatPaneName);
+
     socket = new WebSocket('ws://' + serverMachineName + ':' + serverPort + '/');
     setupSocket();
 
-    $('#send').click(function () {
-        var chatMessage = $('#textToSend').val();
-        send("PostChatToRoom", [clientName, chatMessage]);
-    });
-
-    reloadChatRoomDataFromDb();
+    initializeDb();
+    reloadChatRoomDataFromDb();    
 }
 
 function initializeDb() {
@@ -62,6 +64,23 @@ function initializeDb() {
     openRequest.onerror = function (e) {
         alert("Couldnot load database, please refresh the page.");
     }
+}
+
+function registerStaticEvents()
+{
+    $('#send').click(function () {
+        var chatMessage = $('#textToSend').val();
+        var command = currentChatPaneName == roomName ? "PostChatToRoom" : "PostChatToPerson";
+        send(command, [clientID, clientName, currentChatPaneId, currentChatPaneName, chatMessage]);
+        $('#textToSend').val("");
+    });
+
+    // "Enter" handlers - these just trigger a 'Click' event.
+    $('#textToSend').keypress(function (e) {
+        if (e.which == 13) {
+            $('#send').trigger('click');
+        }
+    });
 }
 
 function setupSocket() {
@@ -87,11 +106,17 @@ function setupSocket() {
 function processIncoming(msgData) {
     if (typeof (msgData.Error) !== 'undefined' && !msgData.Error) {
         switch (msgData.Command) {
-            // Handle success commands here.
-            case 'PostChatToRoom':
-                updateChatRoomDb(msgData.When, msgData.From, msgData.Message);
-                if (currentChatPane == c_room) {
-                    updateChatRoomHtml(msgData.When, msgData.From, msgData.Message);
+            //case 'ReceiveChatForRoom':
+            //    updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
+            //    if (currentChatPaneName == roomName) {
+            //        updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
+            //    }
+            //    break;
+            //case 'ReceiveChatFromUser':
+            case 'ReceiveChat':
+                updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
+                if (currentChatPaneName == msgData.FromName || currentChatPaneName == msgData.ToName) {
+                    updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
                 }
                 break;
             case 'ClientList':
@@ -101,23 +126,53 @@ function processIncoming(msgData) {
     }
 }
 
+// used by other methods, modify with caution.
+function updateChatRoomHtml(when, from, message) {
+    $("#chatList").append(
+        $('<li>').append(from + ':' + message));
+}
 
 
-function updateChatRoomDb(when, from, message) {
-        
+//updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
+function updateChatRoomDb(when, fromId, fromName, toId, toName, message) {
+
     var transaction = dbRoomChat.transaction([c_databaseName], "readwrite");
     var store = transaction.objectStore(c_databaseName);
-    var chatData = { "room": roomName, "when": when, "from": from, "message": message };
+    var chatData = { "when": when, "fromId": fromId, "fromName": fromName, "toId": toId, "toName": toName, "message": message };
     var request = store.add(chatData, when);
     request.onerror = function (e) {
         console.log("Error", e.target.error.name);
     }
 }
 
-function updateChatRoomHtml(when, from, message)
-{
-    $("#chatList").append(
-            $('<li>').append(from + ':' + message));
+function reloadChatFromDataFromDb(fromName) {
+    var transaction = dbRoomChat.transaction([c_databaseName]);
+    var store = transaction.objectStore(c_databaseName);
+    store.openCursor().onsuccess = function (event) {
+        var cursor = event.target.result;
+        if (cursor) {
+            // Display only chats with the chosen user.
+            if ((cursor.value.fromName == fromName && cursor.value.toName == clientName) || (cursor.value.toName == fromName && cursor.value.fromName == clientName)) {
+                updateChatRoomHtml(cursor.value.when, cursor.value.fromName, cursor.value.message);
+            }
+            cursor.continue();
+        }        
+    }
+}
+
+function reloadChatRoomDataFromDb() {
+    var transaction = dbRoomChat.transaction([c_databaseName]);
+    var store = transaction.objectStore(c_databaseName);
+    store.openCursor().onsuccess = function (event) {
+        var cursor = event.target.result;
+        if (cursor) {
+            // Display only chats in the current room.
+            if (cursor.value.toName == roomName) {
+                updateChatRoomHtml(cursor.value.when, cursor.value.fromName, cursor.value.message);
+            }
+            cursor.continue();
+        }        
+    }
 }
 
 function isObjectEmpty(object) {
@@ -153,45 +208,41 @@ function updateClientList(data) {
     $('#clientList').empty();
 
     var userElement = $('<li>');
-    userElement.append("Room: " + roomName);
-    userElement.attr("id", c_room);
+    userElement.append(roomName);
+    userElement.attr("id", roomName);
     $('#clientList').append(userElement);
 
     data.forEach(function (e) {
 
-        var userElement = $('<li>');
-        userElement.append(e.Name);
-        userElement.attr("id", e.ID);
-        $('#clientList').append(userElement);
+        // Updates the ID of the current logged in user.
+        if (e.Name == clientName) {
+            clientID = e.ID;
+        }
+        else {
+            var userElement = $('<li>');
+            userElement.append(e.Name);
+            userElement.attr("id", e.ID);
+            $('#clientList').append(userElement);
+        }
     });
 
     $('#clientList li').click(function () {
         $("#chatList").html("");
 
-        if (this.id == c_room)
-        {
+        currentChatPaneId = this.id;
+        currentChatPaneName = this.innerText;
+
+        $("#withUserOrRoom").text(currentChatPaneName);
+
+        if (this.id == roomName) {
             reloadChatRoomDataFromDb();
         }
 
-    });
-}
-
-function reloadChatRoomDataFromDb() {
-    var transaction = dbRoomChat.transaction([c_databaseName]);
-    var store = transaction.objectStore(c_databaseName);
-    store.openCursor().onsuccess = function (event) {
-        var cursor = event.target.result;
-        if (cursor) {
-            // Display only chats in the current room.
-            if (cursor.value.room == roomName) {
-                updateChatRoomHtml(cursor.value.when ,cursor.value.from, cursor.value.message);
-            }
-            cursor.continue();
-        }
         else {
-            // end of cursor.
+            reloadChatFromDataFromDb(currentChatPaneName);
         }
-    }
+
+    });
 }
 
 // JSON-serializes an object (this is just a quick wrapper to make other source easier to read).

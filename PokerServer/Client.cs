@@ -261,11 +261,38 @@ namespace WebSocketServer
         /// Broadcasts chat message to all clients in the room.
         /// </summary>
         [WebSocketCall]
-        public void PostChatToRoom(string from, string message)
+        public void PostChatToRoom(string fromId, string fromName, string toRoomId, string toRoomName, string message)
         {
-            server.BroadcastMessage(null, "PostChatToRoom", new JProperty []{ new JProperty("From", from), new JProperty("Message", message), new JProperty("When", DateTime.UtcNow) });
+            server.BroadcastMessage(null, "ReceiveChat", new JProperty []{
+                new JProperty("When", DateTime.UtcNow),
+                new JProperty("FromId", fromId),
+                new JProperty("FromName", fromName),
+                new JProperty("ToId", toRoomId),
+                new JProperty("ToName", toRoomName),                
+                new JProperty("Message", message)
+            });
         }
 
+        /// <summary>
+        /// Broadcasts chat message to all clients in the room.
+        /// </summary>
+        [WebSocketCall]
+        public void PostChatToPerson(string fromId, string fromName, string toId, string toName, string message)
+        {
+            // Send chat to both to and from users.
+            var listClientsWithId = server.Clients.Where(c => (c.Info.ID == toId || c.Info.ID == fromId)).ToList();
+            var parameters = new JProperty[] {
+                new JProperty("When", DateTime.UtcNow),
+                new JProperty("FromId", fromId),
+                new JProperty("FromName", fromName),
+                new JProperty("ToId", toId),
+                new JProperty("ToName", toName),
+                new JProperty("Message", message)
+            };
+
+            listClientsWithId.ForEach(c => c.SendMessage("ReceiveChat", parameters));            
+        }
+        
         #endregion
 
         #region Admin Functions

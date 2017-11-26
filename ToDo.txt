@@ -1,0 +1,5 @@
+1. on connect RegisterClient method is called back in js from server, use it.
+2. Onload chat coversation @ is not displaying room name
+3. usernames and chatroom name should all be unique and non case sensitive (convert to upper)
+4. User name list Li should have name attribute instead of innerText reliability
+4. Remove timer from cardclient.js window.onload
