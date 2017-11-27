@@ -432,6 +432,10 @@ function processIncoming(msgData) {
                 $('#sortCards').removeAttr('disabled'); // SortCards failed, so re-enable the button.
                 alert(msgData.ErrorMessage);
                 break;
+            case 'RefreshPage':
+                alert(msgData.ErrorMessage);
+                location.reload();
+                break;
             default:
                 alert(msgData.ErrorMessage);
                 break;

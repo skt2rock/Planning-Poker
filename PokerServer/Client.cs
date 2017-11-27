@@ -168,7 +168,7 @@ namespace WebSocketServer
             // Ensures names are unique in a room. Non case sensitive.
             if (server.Clients.Count(c => string.IsNullOrWhiteSpace(c.Info.Name) ? false : c.Info.Name.ToUpper().Equals(name.ToUpper())) > 0)
             {
-                SendError("RegisterClient", "Name is already in use, please try another name.");
+                SendError("RefreshPage", "Name is already in use, please try another name.");
                 return;
             }
 

@@ -345,7 +345,7 @@ em {
 
         .menu .fa:before {
             margin-right: 15px;
-            color: #20A8D8;
+            color: white;
         }
 
         .menu .fa:after {
@@ -358,6 +358,14 @@ em {
     .menu .fa-user-o {
         padding-left: 30px;        
     }
+
+.chat .menu .fa:before {
+    color: #20A8D8;
+}
+
+.chat .menu .offline:before {
+    color: lightgray;
+}
 
     .menu .fa-home:before {
         font-size: 1.3em;
@@ -480,17 +488,21 @@ em {
     margin: 25px 0px 0px 0px;
 }
 
-#clientList .active {
+.chat #userLists .active {
     background-color: #33444c;
 }
 
-.chat #clientList li {
+.chat #userLists li {
     cursor: pointer;
 }
 
-.chat #clientList li:hover {
+.chat #userLists li:hover {
     background-color: #20a8d8;
 }
+
+    .chat #userLists li:hover:before {
+        color: white;
+    }
 
     #clientList .new-message:after {
         content: "\f075";

@@ -1,5 +1,1 @@
-1. on connect RegisterClient method is called back in js from server, use it.
-
-
-
-4. Remove timer from cardclient.js window.onload
+1. offline user click not working, investigate.

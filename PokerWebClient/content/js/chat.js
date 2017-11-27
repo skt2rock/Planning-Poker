@@ -206,6 +206,41 @@ function reloadChatRoomDataFromDb() {
     }
 }
 
+function updateOfflineUserListFromDb() {
+
+    $('#offlineClientList').empty();
+
+    var transaction = dbRoomChat.transaction([c_databaseName]);
+    var store = transaction.objectStore(c_databaseName);
+    store.openCursor().onsuccess = function (event) {
+        var cursor = event.target.result;
+        if (cursor) {
+            // find all chats sent to current user.
+            if (cursor.value.toName == clientName) {
+                if ($("#userLists").find($('[name="' + cursor.value.fromName + '"]')).length <= 0) {
+                    var userElement = $('<li>');
+                    userElement.addClass("fa fa-user-o offline");
+                    userElement.append(cursor.value.fromName);
+                    userElement.attr("id", "offline-" + cursor.value.fromName);
+                    userElement.attr("name", cursor.value.fromName);
+                    $('#offlineClientList').append(userElement);
+                }
+            }
+            else if (cursor.value.fromName == clientName) {
+                if ($("#userLists").find($('[name="' + cursor.value.toName + '"]')).length <= 0) {
+                    var userElement = $('<li>');
+                    userElement.addClass("fa fa-user-o offline");
+                    userElement.append(cursor.value.toName);
+                    userElement.attr("id", "offline-" + cursor.value.toName);
+                    userElement.attr("name", cursor.value.toName);
+                    $('#offlineClientList').append(userElement);
+                }
+            }
+            cursor.continue();
+        }
+    }
+}
+
 function isObjectEmpty(object) {
     if (object == 'undefined' || object == undefined || object == null) {
         return true;
@@ -261,14 +296,28 @@ function updateClientList(data) {
         }
     });
 
-    $('#clientList li').click(function () {
+
+    updateOfflineUserListFromDb();
+
+
+    $('#userLists li').click(function () {
         $("#chatList").html("");
 
         currentChatPaneId = this.id;
         currentChatPaneName = this.getAttribute("name");
 
+        if ($(this).hasClass('offline'))
+        {
+            $('#textToSend').prop('disabled', true);
+            $('#send').prop('disabled', true);
+        }
+        else {
+            $('#textToSend').prop('disabled', false);
+            $('#send').prop('disabled', false);
+        }
+
         $(this).removeClass("new-message");
-        $('#clientList li').removeClass("active");
+        $('#userLists li').removeClass("active");
         $(this).addClass("active");
 
         $("#withUserOrRoom").text(currentChatPaneName);
@@ -280,7 +329,7 @@ function updateClientList(data) {
         else {
             reloadChatFromDataFromDb(currentChatPaneName);
         }
-
+        
     });
 }
 
