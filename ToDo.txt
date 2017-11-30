@@ -1,1 +1,3 @@
-1. offline user click not working, investigate.
+
+2. create backend deta store with flat files
+3. notify on task bar when new chat comes.

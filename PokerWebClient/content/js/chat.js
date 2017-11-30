@@ -22,13 +22,13 @@ var currentChatPaneName;
 
 var dbRoomChat;
 
-$(function () {
+$(document).ready(function () {
     registerStaticEvents();
-    autoResizeContent();
-    $(window).resize(function () {
-        autoResizeContent();
-    });
+    autoResizeContent();    
     initializeChatWindow();
+
+    $(window).one("focus", stopNotification);
+    Notification.requestPermission();    
 });
 
 function autoResizeContent() {
@@ -80,6 +80,13 @@ function initializeDb() {
 }
 
 function registerStaticEvents() {
+
+    // resize elements on auto resize
+    $(window).resize(function () {
+        autoResizeContent();
+    });
+
+    // Send button click event
     $('#send').click(function () {
         var chatMessage = $('#textToSend').val();
         var command = currentChatPaneName == roomName ? "PostChatToRoom" : "PostChatToPerson";
@@ -91,6 +98,37 @@ function registerStaticEvents() {
     $('#textToSend').keypress(function (e) {
         if (e.which == 13) {
             $('#send').trigger('click');
+        }
+    });
+
+    // Username clicked in user list.
+    $(document).on("click", "#userLists li", function () {
+        $("#chatList").html("");
+
+        currentChatPaneId = this.id;
+        currentChatPaneName = this.getAttribute("name");
+
+        if ($(this).hasClass('offline')) {
+            $('#textToSend').prop('disabled', true);
+            $('#send').prop('disabled', true);
+        }
+        else {
+            $('#textToSend').prop('disabled', false);
+            $('#send').prop('disabled', false);
+        }
+
+        $(this).removeClass("new-message");
+        $('#userLists li').removeClass("active");
+        $(this).addClass("active");
+
+        $("#withUserOrRoom").text(currentChatPaneName);
+
+        if (this.id.toUpperCase() == roomName.toUpperCase()) {
+            reloadChatRoomDataFromDb();
+        }
+
+        else {
+            reloadChatFromDataFromDb(currentChatPaneName);
         }
     });
 }
@@ -115,10 +153,28 @@ function setupSocket() {
     };
 }
 
+function stopNotification() {
+    clearTimeout(flashTimer);
+}
+var flashTimer;
+function notifyUserForNewChat(from, message)
+{
+    flashTimer = setTimeout(function () {        
+        $("#notifyIcon").href = $("#notifyIcon").href == 'ChatLogo.png' ? 'PokerLogo.png' : 'ChatLogo.png';
+    }, 1000);
+
+    new Notification("Message from: " + from, {
+        body: message
+    });
+}
+
 function processIncoming(msgData) {
     if (typeof (msgData.Error) !== 'undefined' && !msgData.Error) {
         switch (msgData.Command) {
             case 'ReceiveChat':
+
+                notifyUserForNewChat(msgData.FromName, msgData.Message);
+
                 updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
                 // show new message notification for all users, if not in there pane
                 if (msgData.ToName.toUpperCase() != roomName.toUpperCase() &&
@@ -129,7 +185,7 @@ function processIncoming(msgData) {
                 if (currentChatPaneName.toUpperCase() != roomName.toUpperCase() && msgData.ToName.toUpperCase() == roomName.toUpperCase()) {
                     $('[name="' + roomName + '"]').addClass("new-message");
                 }
-
+                // update chat if in current pane.
                 if (currentChatPaneName.toUpperCase() == msgData.FromName.toUpperCase() || currentChatPaneName.toUpperCase() == msgData.ToName.toUpperCase()) {
                     if (msgData.ToName.toUpperCase() != roomName.toUpperCase()) {
                         updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
@@ -300,37 +356,37 @@ function updateClientList(data) {
     updateOfflineUserListFromDb();
 
 
-    $('#userLists li').click(function () {
-        $("#chatList").html("");
+    //$('#userLists li').click(function () {
+    //    $("#chatList").html("");
 
-        currentChatPaneId = this.id;
-        currentChatPaneName = this.getAttribute("name");
+    //    currentChatPaneId = this.id;
+    //    currentChatPaneName = this.getAttribute("name");
 
-        if ($(this).hasClass('offline'))
-        {
-            $('#textToSend').prop('disabled', true);
-            $('#send').prop('disabled', true);
-        }
-        else {
-            $('#textToSend').prop('disabled', false);
-            $('#send').prop('disabled', false);
-        }
+    //    if ($(this).hasClass('offline'))
+    //    {
+    //        $('#textToSend').prop('disabled', true);
+    //        $('#send').prop('disabled', true);
+    //    }
+    //    else {
+    //        $('#textToSend').prop('disabled', false);
+    //        $('#send').prop('disabled', false);
+    //    }
 
-        $(this).removeClass("new-message");
-        $('#userLists li').removeClass("active");
-        $(this).addClass("active");
+    //    $(this).removeClass("new-message");
+    //    $('#userLists li').removeClass("active");
+    //    $(this).addClass("active");
 
-        $("#withUserOrRoom").text(currentChatPaneName);
+    //    $("#withUserOrRoom").text(currentChatPaneName);
 
-        if (this.id.toUpperCase() == roomName.toUpperCase()) {
-            reloadChatRoomDataFromDb();
-        }
+    //    if (this.id.toUpperCase() == roomName.toUpperCase()) {
+    //        reloadChatRoomDataFromDb();
+    //    }
 
-        else {
-            reloadChatFromDataFromDb(currentChatPaneName);
-        }
+    //    else {
+    //        reloadChatFromDataFromDb(currentChatPaneName);
+    //    }
         
-    });
+    //});
 }
 
 // JSON-serializes an object (this is just a quick wrapper to make other source easier to read).
