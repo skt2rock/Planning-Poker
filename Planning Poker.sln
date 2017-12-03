@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerWebClient", "PokerWebC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomManagerForms", "ServerManagerForms\RoomManagerForms.csproj", "{EF968305-C879-4381-97DA-9BA358E9F219}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{85E48B41-706B-492E-A2DF-2FF35AFCA66D}"
+	ProjectSection(SolutionItems) = preProject
+		Copy-WebOutput-to-MainOutput-folder.cmd = Copy-WebOutput-to-MainOutput-folder.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

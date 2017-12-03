@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Fleck;
+﻿using Fleck;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PokerServer;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace WebSocketServer
 {
@@ -13,6 +15,10 @@ namespace WebSocketServer
     /// </summary>
     public class Client : IDisposable
     {
+        private const string dataFile = "ChatData.txt";
+
+        private string currentDirectory { get; set; }
+
         /// <summary>
         /// Gets the underlying web socket connection.
         /// </summary>
@@ -52,6 +58,8 @@ namespace WebSocketServer
             conn.OnClose = Disconnected;
 
             Info.ID = Guid.NewGuid().ToString();
+
+            currentDirectory = Directory.GetCurrentDirectory();
         }
 
         #region Client Methods
@@ -270,14 +278,22 @@ namespace WebSocketServer
         [WebSocketCall]
         public void PostChatToRoom(string fromId, string fromName, string toRoomId, string toRoomName, string message)
         {
-            server.BroadcastMessage(null, "ReceiveChat", new JProperty []{
+            JProperty[] entry = new JProperty[]{
                 new JProperty("When", DateTime.UtcNow),
                 new JProperty("FromId", fromId),
                 new JProperty("FromName", fromName),
                 new JProperty("ToId", toRoomId),
-                new JProperty("ToName", toRoomName),                
+                new JProperty("ToName", toRoomName),
                 new JProperty("Message", message)
-            });
+            };
+
+            server.BroadcastMessage(null, "ReceiveChat", entry);
+
+            // Persist chat to Database
+            ChatDataBaseEntities chatDataBaseEntities = new ChatDataBaseEntities();
+            chatDataBaseEntities.Chats.Add(new Chat() { When = DateTime.UtcNow, FromId = fromId, FromName = fromName, ToId = toRoomId, ToName = toRoomName, Message = message });
+            chatDataBaseEntities.SaveChanges();
+            chatDataBaseEntities.Dispose();
         }
 
         /// <summary>
@@ -297,9 +313,58 @@ namespace WebSocketServer
                 new JProperty("Message", message)
             };
 
-            listClientsWithId.ForEach(c => c.SendMessage("ReceiveChat", parameters));            
+            listClientsWithId.ForEach(c => c.SendMessage("ReceiveChat", parameters));
+
+            // Persist chat to Database
+            ChatDataBaseEntities chatDataBaseEntities = new ChatDataBaseEntities();
+            chatDataBaseEntities.Chats.Add(new Chat() { When = DateTime.UtcNow, FromId = fromId, FromName = fromName, ToId = toId, ToName = toName, Message = message });
+            chatDataBaseEntities.SaveChanges();
+            chatDataBaseEntities.Dispose();
         }
-        
+
+        /// <summary>
+        /// Returns all chats of a user from the database to the user's client.
+        /// </summary>
+        [WebSocketCall]
+        public void GetAllChatFor(string clientName, string roomName)
+        {
+            ChatDataBaseEntities chatDataBaseEntities = new ChatDataBaseEntities();
+
+            // <Skt:Todo> delete following line.
+            List<Chat> allChats = chatDataBaseEntities.Chats.ToList();
+
+            List<Chat> chats = chatDataBaseEntities.Chats.Where(c => c.FromName == clientName || c.ToName == clientName || c.ToName == roomName).ToList();
+            List<JObject> chatList = new List<JObject>();
+            foreach (Chat chat in chats)
+            {
+                JProperty[] chatItem = new JProperty[] {
+                    new JProperty("When", chat.When),
+                    new JProperty("FromId", chat.FromId),
+                    new JProperty("FromName", chat.FromName),
+                    new JProperty("ToId", chat.ToId),
+                    new JProperty("ToName", chat.ToName),
+                    new JProperty("Message", chat.Message)
+                };
+                JObject jo = new JObject(chatItem);
+                chatList.Add(jo);
+            }
+
+
+            Client client = server.Clients.Find(c => c.Info.Name == clientName);
+
+            if (client != null)
+            {
+                JProperty chatListJProp = new JProperty("ChatList", chatList.ToArray());
+                JProperty[] response = new JProperty[] { chatListJProp };
+                client.SendMessage("ReceiveAllChat", response);
+            }
+
+
+
+            //server.Clients.Find(c => c.Info.Name == clientName).SendMessage("ReceiveAllChat", new JProperty[] { new JProperty("ChatList", chatList.ToArray()) } );
+
+        }
+
         #endregion
 
         #region Admin Functions

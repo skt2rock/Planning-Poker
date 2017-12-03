@@ -17,18 +17,24 @@ var queryStringParams = null;
 
 const c_room = "room";
 const c_databaseName = "ppRoomChat";
+var r_socketEndPoint; // Readonly, it is initialised only in Initialize window function.
 var currentChatPaneId;
 var currentChatPaneName;
 
+var retryConnectTimerId = 0;
+var retryInterval = 1000;
+
 var dbRoomChat;
+initializeDb();
 
 $(document).ready(function () {
     registerStaticEvents();
-    autoResizeContent();    
+    autoResizeContent();
+
     initializeChatWindow();
 
     $(window).one("focus", stopNotification);
-    Notification.requestPermission();    
+    Notification.requestPermission();
 });
 
 function autoResizeContent() {
@@ -37,24 +43,18 @@ function autoResizeContent() {
 }
 
 function initializeChatWindow() {
-
     clientName = localStorage.getItem("clientName");
     roomName = localStorage.getItem("serverName");
     serverMachineName = localStorage.getItem("machineName");
     serverPort = localStorage.getItem("port");
     currentChatPaneId = localStorage.getItem("serverName");
     currentChatPaneName = localStorage.getItem("serverName");
+    r_socketEndPoint = 'ws://' + serverMachineName + ':' + serverPort + '/';
 
     $('#currentUser').html(clientName);
     $("#withUserOrRoom").text(currentChatPaneName);
 
-    socket = new WebSocket('ws://' + serverMachineName + ':' + serverPort + '/');
-    setupSocket();
-
-    initializeDb();
-    reloadChatRoomDataFromDb();
-
-    $('#clientList li:first').addClass("active");
+    setupSocket(r_socketEndPoint);
 }
 
 function initializeDb() {
@@ -133,23 +133,44 @@ function registerStaticEvents() {
     });
 }
 
-function setupSocket() {
+function setupSocket(socketEndPoint) {
+    socket = new WebSocket(socketEndPoint);
     socket.onopen = function () {
+        // if retry connect interval has been fired.
+        if (window.retryConnectTimerId) {
+            // Stopr trying to connect to the server.
+            window.clearInterval(window.retryConnectTimerId);
+            window.retryConnectTimerId = 0;
+        }
+        everConnected = true;
+        $("#currentUser").removeClass("offline");
+//        $('#chatList').empty();
         send("RegisterClient", [clientName, 0]);
+        // Request to return all chat database for current user from server.
+        send("GetAllChatFor", [clientName, roomName]);
+        $('#disconnected').hide();
     };
     socket.onmessage = function (event) {
         processIncoming(JSON.parse(event.data));
     };
     socket.onclose = function () {
-
         if (everConnected) {
-            $('#disconnected').html('The room has terminated the connection.');
+            $('#disconnected').html('You are offline. Read chats, while we connect you back.');
         }
         else {
             $('#disconnected').html('Unable to enter the room.');
         }
         $('#disconnected').show();
-        everConnected = false;
+
+        $("#currentUser").addClass("offline");
+        $("#clientList").empty();
+        updateOfflineUserListFromDb();
+
+        // Avoid firing a new setInterval, after one has been done
+        if (!window.retryConnectTimerId) {
+            // Fire in 1 second then in 6 second then in 11 seeconds, till every 5 minutes.
+            window.retryConnectTimerId = setInterval(function () { setupSocket(r_socketEndPoint) }, retryInterval += retryInterval > 300000 ? 0 : 5000);
+        }
     };
 }
 
@@ -157,9 +178,8 @@ function stopNotification() {
     clearTimeout(flashTimer);
 }
 var flashTimer;
-function notifyUserForNewChat(from, message)
-{
-    flashTimer = setTimeout(function () {        
+function notifyUserForNewChat(from, message) {
+    flashTimer = setTimeout(function () {
         $("#notifyIcon").href = $("#notifyIcon").href == 'ChatLogo.png' ? 'PokerLogo.png' : 'ChatLogo.png';
     }, 1000);
 
@@ -172,9 +192,7 @@ function processIncoming(msgData) {
     if (typeof (msgData.Error) !== 'undefined' && !msgData.Error) {
         switch (msgData.Command) {
             case 'ReceiveChat':
-
                 notifyUserForNewChat(msgData.FromName, msgData.Message);
-
                 updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
                 // show new message notification for all users, if not in there pane
                 if (msgData.ToName.toUpperCase() != roomName.toUpperCase() &&
@@ -194,6 +212,15 @@ function processIncoming(msgData) {
                         updateChatRoomHtml(msgData.When, msgData.FromName, msgData.Message);
                     }
                 }
+                break;
+            case 'ReceiveAllChat':
+                clearChatRoomDb(function () {
+                    msgData.ChatList.forEach(function (chat) {
+                        updateChatRoomDb(chat.When, chat.FromId, chat.FromName, chat.ToId, chat.ToName, chat.Message);
+                    });
+                });
+                reloadChatRoomDataFromDb();
+                $('[name="' + currentChatPaneName + '"]').click();
                 break;
             case 'ClientList':
                 updateClientList(msgData.Clients);
@@ -219,6 +246,17 @@ function updateChatRoomHtml(when, from, message) {
     $("#chatList").parent(".card-body").scrollTop(999999999999999);
 }
 
+
+// clear chatroom db
+function clearChatRoomDb(successCallBack) {
+    var transaction = dbRoomChat.transaction([c_databaseName], "readwrite");
+    var store = transaction.objectStore(c_databaseName);
+    var request = store.clear();
+    request.onsuccess = successCallBack;
+    request.onerror = function (e) {
+        console.log("Error", e.target.error.name);
+    }
+}
 
 //updateChatRoomDb(msgData.When, msgData.FromId, msgData.FromName, msgData.ToId, msgData.ToName, msgData.Message);
 function updateChatRoomDb(when, fromId, fromName, toId, toName, message) {
@@ -266,13 +304,25 @@ function updateOfflineUserListFromDb() {
 
     $('#offlineClientList').empty();
 
+    // add to clinet list only if it is not already there
+    if ($("#userLists").find($('[name="' + roomName + '"]')).length <= 0) {
+        // Register thge room to offline list.
+        var userElement = $('<li>');
+        userElement.addClass("fa fa-home offline");
+        userElement.append(roomName);
+        userElement.attr("id", "offline-" + roomName);
+        userElement.attr("name", roomName);
+        $('#offlineClientList').append(userElement);
+    }
+
     var transaction = dbRoomChat.transaction([c_databaseName]);
     var store = transaction.objectStore(c_databaseName);
     store.openCursor().onsuccess = function (event) {
         var cursor = event.target.result;
         if (cursor) {
-            // find all chats sent to current user.
+            // find all chats sent to current user.            
             if (cursor.value.toName == clientName) {
+                // add to clinet list only if it is not already there
                 if ($("#userLists").find($('[name="' + cursor.value.fromName + '"]')).length <= 0) {
                     var userElement = $('<li>');
                     userElement.addClass("fa fa-user-o offline");
@@ -282,7 +332,9 @@ function updateOfflineUserListFromDb() {
                     $('#offlineClientList').append(userElement);
                 }
             }
+            // find all chats sent by the current user.
             else if (cursor.value.fromName == clientName) {
+                // add to clinet list only if it is not already there
                 if ($("#userLists").find($('[name="' + cursor.value.toName + '"]')).length <= 0) {
                     var userElement = $('<li>');
                     userElement.addClass("fa fa-user-o offline");
@@ -294,7 +346,13 @@ function updateOfflineUserListFromDb() {
             }
             cursor.continue();
         }
+        // Cursor complete
+        else {
+            $('[name="' + currentChatPaneName + '"]').addClass("active");
+        }
     }
+
+
 }
 
 function isObjectEmpty(object) {
@@ -328,6 +386,7 @@ function updateClientList(data) {
     clientListCache = data;
 
     $('#clientList').empty();
+    $('#offlineClientList').empty();
 
     var userElement = $('<li>');
     userElement.addClass("fa fa-home");
@@ -352,41 +411,13 @@ function updateClientList(data) {
         }
     });
 
-
     updateOfflineUserListFromDb();
 
+    // on initial load, show room as active
+    if ($('#clientList li.active').length <= 0) {
+        $('#clientList li:first').click();
 
-    //$('#userLists li').click(function () {
-    //    $("#chatList").html("");
-
-    //    currentChatPaneId = this.id;
-    //    currentChatPaneName = this.getAttribute("name");
-
-    //    if ($(this).hasClass('offline'))
-    //    {
-    //        $('#textToSend').prop('disabled', true);
-    //        $('#send').prop('disabled', true);
-    //    }
-    //    else {
-    //        $('#textToSend').prop('disabled', false);
-    //        $('#send').prop('disabled', false);
-    //    }
-
-    //    $(this).removeClass("new-message");
-    //    $('#userLists li').removeClass("active");
-    //    $(this).addClass("active");
-
-    //    $("#withUserOrRoom").text(currentChatPaneName);
-
-    //    if (this.id.toUpperCase() == roomName.toUpperCase()) {
-    //        reloadChatRoomDataFromDb();
-    //    }
-
-    //    else {
-    //        reloadChatFromDataFromDb(currentChatPaneName);
-    //    }
-        
-    //});
+    }
 }
 
 // JSON-serializes an object (this is just a quick wrapper to make other source easier to read).

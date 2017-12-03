@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[Table]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [When] DATETIME NOT NULL, 
+    [FromId] NVARCHAR(50) NOT NULL, 
+    [FromName] NVARCHAR(50) NOT NULL, 
+    [ToId] NVARCHAR(50) NOT NULL, 
+    [ToName] NVARCHAR(50) NOT NULL, 
+    [Message] NVARCHAR(50) NOT NULL
+)

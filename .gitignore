@@ -17,3 +17,4 @@
 /PokerWebClient/obj/Release
 /ServerManagerForms/bin/Release
 /ServerManagerForms/obj/Release
+*.user

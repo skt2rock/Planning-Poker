@@ -363,8 +363,14 @@ em {
     color: #20A8D8;
 }
 
-.chat .menu .offline:before {
-    color: lightgray;
+.offline:before {
+    color: lightgray !important;
+}
+
+.chat #disconnected {
+    color: #D00;
+    font-size: .8rem;
+    margin-left: 10px;
 }
 
     .menu .fa-home:before {

@@ -31,6 +31,8 @@ namespace RoomManagerForms
 
         private void btnCreate_Click(object sender, EventArgs e)
         {
+            // clears closed servers from the list.
+            BindRoomList();
             CreateRoom();
         }
 
@@ -165,10 +167,10 @@ namespace RoomManagerForms
 
                     // Now, you'll find the request URL in context.Request.Url
                     string requestedPathUrl = context.Request.Url.AbsolutePath;
-                    
+
                     //Converts web path to file path
                     string filePath = WebSiteLocation + requestedPathUrl.Replace("/", @"\");
-                    
+
                     if (requestedPathUrl == "/")
                     {
                         filePath += DefaultFile;
@@ -207,7 +209,7 @@ namespace RoomManagerForms
             {
                 context.Response.ContentType = "text/html";
             }
-            
+
             context.Response.OutputStream.Write(_responseArray, 0, _responseArray.Length); // write bytes to the output stream
             context.Response.KeepAlive = false; // set the KeepAlive bool to false
             context.Response.Close(); // close the connection
@@ -334,5 +336,56 @@ namespace RoomManagerForms
         {
             PopulateRoomManager();
         }
+
+        private void Password_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //When enter is pressed in password textbox, new room server is created.
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                // clears closed servers from the list.
+                BindRoomList();
+                CreateRoom();
+            }
+        }
+
+        private void IP_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //When enter is pressed in IP textbox, new room server is created.
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                // clears closed servers from the list.
+                BindRoomList();
+                CreateRoom();
+            }
+        }
+
+        private void RoomName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //When enter is pressed in RoomName textbox, focus is moved to password text box.
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                Password.Focus();
+            }
+        }
+                
+        private void RoomName_Enter(object sender, EventArgs e)
+        {
+            RoomName.SelectAll();
+        }
+
+        private void Password_Enter(object sender, EventArgs e)
+        {
+            Password.SelectAll();
+        }
+
+        private void WebClientFolderPath_Enter(object sender, EventArgs e)
+        {
+            WebClientFolderPath.SelectAll();
+        }
+
+        private void UrlToHostAt_Enter(object sender, EventArgs e)
+        {
+            UrlToHostAt.SelectAll();
+        }        
     }
 }

@@ -68,7 +68,6 @@
             this.FileDialogPokerServer = new System.Windows.Forms.OpenFileDialog();
             this.FolderBrowserWebClient = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.lblTest = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RoomContainer)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -102,6 +101,8 @@
             this.RoomName.Name = "RoomName";
             this.RoomName.Size = new System.Drawing.Size(175, 20);
             this.RoomName.TabIndex = 4;
+            this.RoomName.Enter += new System.EventHandler(this.RoomName_Enter);
+            this.RoomName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.RoomName_KeyPress);
             // 
             // PortNumber
             // 
@@ -128,6 +129,8 @@
             this.Password.PasswordChar = '*';
             this.Password.Size = new System.Drawing.Size(175, 20);
             this.Password.TabIndex = 5;
+            this.Password.Enter += new System.EventHandler(this.Password_Enter);
+            this.Password.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Password_KeyPress);
             // 
             // label3
             // 
@@ -362,6 +365,7 @@
             this.UrlToHostAt.TabIndex = 1;
             this.UrlToHostAt.Text = "http://localhost:5000/";
             this.UrlToHostAt.TextChanged += new System.EventHandler(this.UrlToHostAt_TextChanged);
+            this.UrlToHostAt.Enter += new System.EventHandler(this.UrlToHostAt_Enter);
             // 
             // WebClientFolderPath
             // 
@@ -370,6 +374,7 @@
             this.WebClientFolderPath.Size = new System.Drawing.Size(315, 20);
             this.WebClientFolderPath.TabIndex = 29;
             this.WebClientFolderPath.TextChanged += new System.EventHandler(this.WebClientFolderPath_TextChanged);
+            this.WebClientFolderPath.Enter += new System.EventHandler(this.WebClientFolderPath_Enter);
             // 
             // btnHostWebClient
             // 
@@ -409,6 +414,7 @@
             this.IP.Size = new System.Drawing.Size(108, 20);
             this.IP.TabIndex = 21;
             this.IP.Text = "127.0.0.1";
+            this.IP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.IP_KeyPress);
             // 
             // label5
             // 
@@ -468,21 +474,11 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Create Room";
             // 
-            // lblTest
-            // 
-            this.lblTest.AutoSize = true;
-            this.lblTest.Location = new System.Drawing.Point(38, 534);
-            this.lblTest.Name = "lblTest";
-            this.lblTest.Size = new System.Drawing.Size(31, 13);
-            this.lblTest.TabIndex = 25;
-            this.lblTest.Text = "Test:";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 562);
-            this.Controls.Add(this.lblTest);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -499,7 +495,6 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -545,7 +540,6 @@
         private System.Windows.Forms.MaskedTextBox WebHostDefaultFile;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label FailMessagePokerServerFileStatus;
-        private System.Windows.Forms.Label lblTest;
     }
 }
 

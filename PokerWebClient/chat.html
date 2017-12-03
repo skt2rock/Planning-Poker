@@ -28,7 +28,8 @@
     <div class="content">
         <div class="header">
             <h1>
-                <img class="logo" src="content/css/ChatLogo.png"><span>FC Chat</span>                
+                <img class="logo" src="content/css/ChatLogo.png"><span>FC Chat</span>
+                <span id="disconnected"></span>
                 <span class="fa fa-user-circle" id="currentUser">skt</span>
             </h1>
         </div>
@@ -36,16 +37,16 @@
         <div class="body">
             <div class="card">
                 <div class="card-header"><strong id="withUserOrRoom"></strong></div>
-                <div class="card-body">                    
+                <div class="card-body">
                     <ul id="chatList"></ul>
                 </div>
                 <div class="card-footer">
-                    <input id="textToSend" class="send-text"/>
+                    <input id="textToSend" class="send-text" />
                     <button id="send" class="fa fa-paper-plane send-button"></button>
                 </div>
-            </div>           
+            </div>
         </div>
     </div>
-    
+
 </body>
 </html>
