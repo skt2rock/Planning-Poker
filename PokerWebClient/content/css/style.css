@@ -4,6 +4,10 @@
     color: black;
 }
 
+strong {
+    font-weight:bold !important;
+}
+
 button {
     color: black;
     padding: 6px 10px 6px 10px;
@@ -103,8 +107,8 @@ em {
 
 .fa-lg {
     float: left;
-    font-size: 1.2em;
-    top: .1em;
+    font-size: 1em;
+    top: .15em;
     position: relative;
 }
 
@@ -150,7 +154,7 @@ em {
     display: inline-block;
     width: 72px;
     border-radius: 1px;
-    margin: 20px;
+    margin: 14px;
     text-align: center;
     vertical-align: middle;
     font-size: 30px;
@@ -173,9 +177,9 @@ em {
 }
 
 .cardup {
-    background-color: #FFCD38;
-    border: 1px solid #e6bb3b;
-    box-shadow: 0px 0px 0px 10px #FFCD38;
+    border: 1px solid #20a8d8;
+    box-shadow: 0px 0px 0px 7px #8ddaf5;
+    background: repeating-linear-gradient(45deg, #cff2ff, #cff2ff 2px, #ffffff 2px, #ffffff 5px);
 }
 
 .round {
@@ -185,9 +189,9 @@ em {
 }
 
     .round .cardup:hover {
-        background-color: #ffd764;
-        border: 1px solid #c69500;
+        border: 1px solid #20a8d8;
         cursor: pointer;
+        background: #d3eff9;
     }
 
 .cardName {
@@ -240,6 +244,15 @@ em {
     font-size: 1.3em;
 }
 
+.badge {
+    color: #fff;
+    background-color: #f86c6b;
+    border-radius: .4rem;
+    margin-left: 15px;
+    padding: 1px 5px 1px 5px;
+    font-size: .65rem;
+}
+
 .card {
     position: relative;
     display: -ms-flexbox;
@@ -252,6 +265,11 @@ em {
     background-clip: border-box;
     border: 1px solid #c2cfd6;
 }
+
+    .card .fa:before {
+        margin-right: 15px;
+        font-weight: normal;
+    }
 
     .card h2 {
         padding-top: 0px;

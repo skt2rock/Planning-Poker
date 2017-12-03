@@ -1,18 +1,15 @@
 
-4. make all client list offline when offline, refresh icons to online when online.
-increase offline connecting retry interval to 1 minute.
-after offline, after refresh, apply active to current window offline client list item
-fix offline message and style
+
 5. make server.Clients as singelton. (dirty read possibility)
 6. check for server.Clients list for null clientName, can be ignored.
 7. Database security to be SQL Server authentication.
-10. clear interval nt clearing connection retry, javascript.
-11. show unread message count.
+
+
 
 
 
 Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=E:\Proj\GitHub\Planning-Poker\PokerServer\PPDatabase.mdf;Integrated Security=True
 
-
-updateClientList()
-updateOfflineUserListFromDb();  
+Database creds:
+administrator
+i@mDadm1n

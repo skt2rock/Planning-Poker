@@ -117,17 +117,25 @@ function registerStaticEvents() {
             $('#send').prop('disabled', false);
         }
 
-        $(this).removeClass("new-message");
+        var badge = $(this).find(".badge");
+        badge.hide();
+        badge.text("0");
         $('#userLists li').removeClass("active");
         $(this).addClass("active");
 
         $("#withUserOrRoom").text(currentChatPaneName);
-
+        
+        
+        // If room is clicked
         if (this.id.toUpperCase() == roomName.toUpperCase()) {
+            $("#withUserOrRoom").removeClass("fa fa-user-o");
+            $("#withUserOrRoom").addClass("fa fa-home");
             reloadChatRoomDataFromDb();
         }
-
+        // if user is clicked
         else {
+            $("#withUserOrRoom").removeClass("fa fa-home");
+            $("#withUserOrRoom").addClass("fa fa-user-o");
             reloadChatFromDataFromDb(currentChatPaneName);
         }
     });
@@ -197,11 +205,15 @@ function processIncoming(msgData) {
                 // show new message notification for all users, if not in there pane
                 if (msgData.ToName.toUpperCase() != roomName.toUpperCase() &&
                     msgData.FromName.toUpperCase() != currentChatPaneName.toUpperCase()) {
-                    $('[name="' + msgData.FromName + '"]').addClass("new-message");
+                    var badge = $('[name="' + msgData.FromName + '"]').find(".badge");
+                    badge.text(parseInt(badge.text()) + 1);
+                    badge.show();
                 }
                 // show new message notification in room chat if not in room pane
-                if (currentChatPaneName.toUpperCase() != roomName.toUpperCase() && msgData.ToName.toUpperCase() == roomName.toUpperCase()) {
-                    $('[name="' + roomName + '"]').addClass("new-message");
+                if (currentChatPaneName.toUpperCase() != roomName.toUpperCase() && msgData.ToName.toUpperCase() == roomName.toUpperCase()) {                    
+                    var badge = $('[name="' + roomName + '"]').find(".badge");
+                    badge.text(parseInt(badge.text()) + 1);
+                    badge.show();
                 }
                 // update chat if in current pane.
                 if (currentChatPaneName.toUpperCase() == msgData.FromName.toUpperCase() || currentChatPaneName.toUpperCase() == msgData.ToName.toUpperCase()) {
@@ -393,7 +405,11 @@ function updateClientList(data) {
     userElement.append(roomName);
     userElement.attr("id", roomName);
     userElement.attr("name", roomName);
+    var badgeElement = $('<span class="badge">');   
+    badgeElement.text("0");
+    userElement.append(badgeElement);
     $('#clientList').append(userElement);
+    badgeElement.hide();
 
     data.forEach(function (e) {
 
@@ -407,7 +423,11 @@ function updateClientList(data) {
             userElement.append(e.Name);
             userElement.attr("id", e.ID);
             userElement.attr("name", e.Name);
+            var badgeElement = $('<span class="badge">');
+            badgeElement.text("0");
+            userElement.append(badgeElement);
             $('#clientList').append(userElement);
+            badgeElement.hide();
         }
     });
 
