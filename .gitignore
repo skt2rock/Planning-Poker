@@ -18,3 +18,4 @@
 /ServerManagerForms/bin/Release
 /ServerManagerForms/obj/Release
 *.user
+/ServerManagerForms/bin

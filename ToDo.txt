@@ -13,3 +13,8 @@ Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=E:\Proj\GitHub\Planning-Poke
 Database creds:
 administrator
 i@mDadm1n
+
+RD /S /Q "PokerWebClient\"
+xcopy /E /Y /exclude:$(ProjectDir)exclude.txt "$(SolutionDir)PokerWebClient" "PokerWebClient\"
+
+
